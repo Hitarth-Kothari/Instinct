@@ -102,7 +102,7 @@ MonoBehaviour:
   Min_difficulty: 3
   Max_difficulty: 20
   Max_difficulty_score: 1000
-  timer: 1e+10
+  timer: 5
 --- !u!58 &7099328415659106167
 CircleCollider2D:
   m_ObjectHideFlags: 0

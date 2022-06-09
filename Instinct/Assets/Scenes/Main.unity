@@ -569,5 +569,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Max_targets: 10
-  score_threshold: 1
+  score_threshold: 20
   target: {fileID: 3304303038240087802, guid: c3de1f458a4cea24eb7de6a3f5157691, type: 3}
