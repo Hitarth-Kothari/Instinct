@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class Randomizer : MonoBehaviour
 {
-    // Max and Min range for Target
-    public float down;
-    public float up;
-    public float left;
-    public float right;
+    // Environment coordinates
+    float down;
+    float up;
+    float left;
+    float right;
+
+    // Error margin
+    float error = 0.5f;
 
     // Target Position used for directional movement
     Vector2 Target_Position;
@@ -29,6 +32,19 @@ public class Randomizer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Camera for screen edge detection
+        Camera cam = Camera.main;
+        // Bottom left corner
+        Vector2 bottomLeft = (Vector2)cam.ScreenToWorldPoint(new Vector3(0, 0, cam.nearClipPlane));
+        // Top right corner
+        Vector2 topRight = (Vector2)cam.ScreenToWorldPoint(new Vector3(cam.pixelWidth, cam.pixelHeight, cam.nearClipPlane));
+        // Max and Min range for Target
+        float d = bottomLeft.y;
+        float u = topRight.y;
+        float l = bottomLeft.x;
+        float r = topRight.x;
+        // Set environment
+        set_environment(d, u, l, r);
         // Random start position
         transform.position = Randomize_Position();
         // Random direction
@@ -59,6 +75,14 @@ public class Randomizer : MonoBehaviour
             }
         }
 
+    }
+    // Sets environment
+    void set_environment(float d, float u, float l, float r)
+    {
+        down = d + error;
+        up = u - error;
+        left = l + error;
+        right = r - error;
     }
 
     // Finds a random point on screen
