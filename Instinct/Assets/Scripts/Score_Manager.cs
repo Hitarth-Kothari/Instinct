@@ -9,7 +9,7 @@ public class Score_Manager : MonoBehaviour
     // Score string
     public TMP_Text Score_Text;
     // Score variable
-    int Score = 0;
+    static int Score;
     // Create instance
     public static Score_Manager instance;
 
@@ -17,6 +17,7 @@ public class Score_Manager : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        Score = 0;
     }
 
     // Start is called before the first frame update

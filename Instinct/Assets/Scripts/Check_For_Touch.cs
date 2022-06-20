@@ -28,42 +28,7 @@ public class Check_For_Touch : MonoBehaviour
     void Update()
     {
         timer += Time.deltaTime;
-        if (timer >= gameObject.GetComponent<Randomizer>().timer)
-        {
-            SceneManager.LoadScene("Start");
-        }
-        if (timer >= 1 && timer < 2)
-        {
-            if (sprite != 4)
-            {
-                this.gameObject.GetComponent<SpriteRenderer>().sprite = four;
-                sprite = 4;
-            }
-        }
-        else if (timer >= 2 && timer < 3)
-        {
-            if (sprite != 3)
-            {
-                this.gameObject.GetComponent<SpriteRenderer>().sprite = three;
-                sprite = 3;
-            }
-        }
-        else if (timer >= 3 && timer < 4)
-        {
-            if (sprite != 2)
-            {
-                this.gameObject.GetComponent<SpriteRenderer>().sprite = two;
-                sprite = 2;
-            }
-        }
-        else if (timer >= 4 && timer < 5)
-        {
-            if (sprite != 1)
-            {
-                this.gameObject.GetComponent<SpriteRenderer>().sprite = one;
-                sprite = 1;
-            }
-        }
+        show_timer(this, timer, sprite);
 
         if (Input.touchCount > 0)
         {
@@ -84,5 +49,44 @@ public class Check_For_Touch : MonoBehaviour
             }
         }
 
+    }
+    void show_timer(Check_For_Touch obj, float timer, int sprite)
+    {
+        if (timer >= gameObject.GetComponent<Randomizer>().Get_timer())
+        {
+            SceneManager.LoadScene("End");
+        }
+        if (timer >= 1 && timer < 2)
+        {
+            if (sprite != 4)
+            {
+                obj.gameObject.GetComponent<SpriteRenderer>().sprite = four;
+                sprite = 4;
+            }
+        }
+        else if (timer >= 2 && timer < 3)
+        {
+            if (sprite != 3)
+            {
+                obj.gameObject.GetComponent<SpriteRenderer>().sprite = three;
+                sprite = 3;
+            }
+        }
+        else if (timer >= 3 && timer < 4)
+        {
+            if (sprite != 2)
+            {
+                obj.gameObject.GetComponent<SpriteRenderer>().sprite = two;
+                sprite = 2;
+            }
+        }
+        else if (timer >= 4 && timer < 5)
+        {
+            if (sprite != 1)
+            {
+                obj.gameObject.GetComponent<SpriteRenderer>().sprite = one;
+                sprite = 1;
+            }
+        }
     }
 }

@@ -568,6 +568,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 584f100ed0111714fb34181550f8ee96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Max_targets: 10
-  score_threshold: 20
   target: {fileID: 3304303038240087802, guid: c3de1f458a4cea24eb7de6a3f5157691, type: 3}

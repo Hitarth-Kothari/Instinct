@@ -6,9 +6,7 @@ public class Spawner : MonoBehaviour
 {
 
     // Max targets
-    public int Max_targets;
-    // Score threshold
-    public int score_threshold;
+    int Max_targets = 10;
     // Object counter
     int counter = 1;
     // Spawn target
@@ -23,10 +21,19 @@ public class Spawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Score_Manager.instance.Get_Score() == (counter*score_threshold))
+        if (Score_Manager.instance.Get_Score() == Get_threshold(counter))
         {
-            Instantiate(target);
-            counter += 1;
+            if (counter < Max_targets)
+            {
+                Instantiate(target);
+                counter += 1;
+            }
         }
+    }
+    int Get_threshold(int counter)
+    {
+        int a = (counter) * (counter);
+        a = 20 * a;
+        return a;
     }
 }

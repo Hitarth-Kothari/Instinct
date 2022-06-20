@@ -17,18 +17,18 @@ public class Randomizer : MonoBehaviour
     Vector2 Target_Position;
 
     // Difficulty
-    public float Min_difficulty;
-    public float Max_difficulty;
+    float Min_difficulty = 3;
+    float Max_difficulty = 20;
     float Difficulty;
 
     // Change Position
     bool change;
 
     // Max difficulty score
-    public int Max_difficulty_score;
+    int Max_difficulty_score = 1000;
 
     // Max time allowed
-    public float timer;
+    float timer = 5;
     // Start is called before the first frame update
     void Start()
     {
@@ -58,12 +58,14 @@ public class Randomizer : MonoBehaviour
     {
         if (change)
         {
+            // respawn target
             transform.position = Randomize_Position();
             Target_Position = Randomize_Position();
             change = false;
         }
         else
         {
+            // difficulty settings
             if ((Vector2)transform.position != Target_Position)
             {
                 Difficulty = Mathf.Lerp(Min_difficulty, Max_difficulty, GetDifficulty());
@@ -104,5 +106,10 @@ public class Randomizer : MonoBehaviour
     float GetDifficulty()
     {
         return Mathf.Clamp01(Score_Manager.instance.Get_Score() / Max_difficulty_score);
+    }
+
+    public float Get_timer()
+    {
+        return timer;
     }
 }

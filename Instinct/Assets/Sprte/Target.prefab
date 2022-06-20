@@ -99,10 +99,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6b3e68621f2a04390d0f72bf3a5e12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Min_difficulty: 3
-  Max_difficulty: 20
-  Max_difficulty_score: 1000
-  timer: 5
 --- !u!58 &7099328415659106167
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -118,7 +114,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.75
 --- !u!114 &3304303038240087806
 MonoBehaviour:
   m_ObjectHideFlags: 0
