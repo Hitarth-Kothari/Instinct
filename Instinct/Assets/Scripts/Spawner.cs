@@ -8,11 +8,16 @@ public class Spawner : MonoBehaviour
     // Max targets
     int Max_targets = 10;
     // Object counter
-    int counter = 1;
+    int counter;
     // Spawn target
     public GameObject target;
 
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        counter = 1;
+    }
     void Start()
     {
         Instantiate(target);

@@ -12,7 +12,7 @@ public class Check_For_Touch : MonoBehaviour
     public Sprite four;
     public Sprite five;
     // Sprite counter
-    int sprite = 5;
+    int sprite;
     // Collider
     Collider2D Col;
     // Timer
@@ -22,6 +22,7 @@ public class Check_For_Touch : MonoBehaviour
     {
         Col = GetComponent<Collider2D>();
         timer = 0;
+        sprite = 5;
     }
 
     // Update is called once per frame
@@ -38,7 +39,7 @@ public class Check_For_Touch : MonoBehaviour
             if (touch.phase == TouchPhase.Began)
             {
                 Collider2D touched_position = Physics2D.OverlapPoint(touch_position);
-                if (Col == touched_position)
+                if (Col == touched_position && Game_Master.Instance.Getpause() == false)
                 {
                     timer = 0;
                     Score_Manager.instance.Add_Score();
