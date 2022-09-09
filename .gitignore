@@ -74,7 +74,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Instinct
-/Instinct/Library
-/Instinct/Game_BackUpThisFolder_ButDontShipItWithYourGame/
-/Instinct/Game_BurstDebugInformation_DoNotShip/
-/Instinct/Temp/
+/Library
+/Game_BackUpThisFolder_ButDontShipItWithYourGame/
+/Game_BurstDebugInformation_DoNotShip/
+/Temp/
