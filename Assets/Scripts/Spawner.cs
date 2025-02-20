@@ -1,44 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Spawns additional targets once certain score thresholds are met.
+/// </summary>
 public class Spawner : MonoBehaviour
 {
+    [Header("Spawner Settings")]
+    [Tooltip("Prefab for the target to be spawned.")]
+    [SerializeField] private GameObject targetPrefab;
 
-    // Max targets
-    int Max_targets = 10;
-    // Object counter
-    int counter;
-    // Spawn target
-    public GameObject target;
+    [Tooltip("Maximum number of targets to spawn.")]
+    [SerializeField] private int maxTargets = 10;
 
-    // Start is called before the first frame update
+    // Counts how many times we've spawned a target
+    private int counter = 1;
 
-    private void Awake()
+    private void Start()
     {
-        counter = 1;
-    }
-    void Start()
-    {
-        Instantiate(target);
+        // Spawn the initial target
+        Instantiate(targetPrefab);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (Score_Manager.instance.Get_Score() == Get_threshold(counter))
+        int currentScore = Score_Manager.instance.Get_Score();
+
+        // If current score hits the threshold and we haven't spawned too many
+        if (currentScore == GetThreshold(counter) && counter < maxTargets)
         {
-            if (counter < Max_targets)
-            {
-                Instantiate(target);
-                counter += 1;
-            }
+            Instantiate(targetPrefab);
+            counter++;
         }
     }
-    int Get_threshold(int counter)
+
+    /// <summary>
+    /// Returns the score threshold for the given counter.
+    /// Example: 20 * (counter^2).
+    /// </summary>
+    private int GetThreshold(int c)
     {
-        int a = (counter) * (counter);
-        a = 20 * a;
-        return a;
+        return 20 * c * c;
     }
 }

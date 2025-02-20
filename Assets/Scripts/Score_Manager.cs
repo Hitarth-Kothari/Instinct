@@ -1,41 +1,60 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// Tracks and displays the current score. 
+/// Provides a global static instance for easy access.
+/// </summary>
 public class Score_Manager : MonoBehaviour
 {
-    // Score string
-    public TMP_Text Score_Text;
-    // Score variable
-    static int Score;
-    // Create instance
+    [Header("UI Reference")]
+    [Tooltip("Text object that displays the current score.")]
+    [SerializeField] private TMP_Text scoreText;
+
+    private static int score;
+
+    /// <summary>
+    /// Global access to the score manager.
+    /// </summary>
     public static Score_Manager instance;
 
-    // Initiate instance
     private void Awake()
     {
+        // Ensure only one instance is active
         instance = this;
-        Score = 0;
+        score = 0;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        Score_Text.text = Score.ToString();
+        UpdateScoreText();
     }
 
-    // Add point
+    /// <summary>
+    /// Increments the player's score by 1 and updates the UI.
+    /// </summary>
     public void Add_Score()
     {
-        Score += 1;
-        Score_Text.text = Score.ToString();
+        score++;
+        UpdateScoreText();
     }
 
-    // Get score
+    /// <summary>
+    /// Returns the current score.
+    /// </summary>
     public int Get_Score()
     {
-        return Score;
+        return score;
+    }
+
+    /// <summary>
+    /// Reflects the current score value in the assigned TextMeshPro element.
+    /// </summary>
+    private void UpdateScoreText()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = score.ToString();
+        }
     }
 }

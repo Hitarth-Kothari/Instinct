@@ -1,93 +1,131 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Handles touch input on a target object. 
+/// Resets timer when tapped and ends the game if time runs out.
+/// </summary>
 public class Check_For_Touch : MonoBehaviour
 {
-    // Sprite images
-    public Sprite one;
-    public Sprite two;
-    public Sprite three;
-    public Sprite four;
-    public Sprite five;
-    // Sprite counter
-    int sprite;
-    // Collider
-    Collider2D Col;
-    // Timer
-    float timer;
-    // Start is called before the first frame update
-    void Start()
+    [Header("Sprites for Countdown")]
+    [Tooltip("Sprite displayed when 1 second remains.")]
+    public Sprite spriteOne;
+
+    [Tooltip("Sprite displayed when 2 seconds remain.")]
+    public Sprite spriteTwo;
+
+    [Tooltip("Sprite displayed when 3 seconds remain.")]
+    public Sprite spriteThree;
+
+    [Tooltip("Sprite displayed when 4 seconds remain.")]
+    public Sprite spriteFour;
+
+    [Tooltip("Sprite displayed when 5 seconds remain (start sprite).")]
+    public Sprite spriteFive;
+
+    // Cached Components
+    private SpriteRenderer spriteRenderer;
+    private Collider2D myCollider;
+    private Randomizer randomizer;
+
+    // Timer for how long until the target must be tapped
+    private float timer;
+
+    // Indicates which sprite is active (1-5)
+    private int currentSpriteIndex;
+
+    private void Start()
     {
-        Col = GetComponent<Collider2D>();
-        timer = 0;
-        sprite = 5;
+        // Cache references to avoid repeated GetComponent calls
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        myCollider = GetComponent<Collider2D>();
+        randomizer = GetComponent<Randomizer>();
+
+        timer = 0f;
+        currentSpriteIndex = 5;
+        spriteRenderer.sprite = spriteFive;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        // Increment timer each frame
         timer += Time.deltaTime;
-        show_timer(this, timer, sprite);
 
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            Vector2 touch_position = Camera.main.ScreenToWorldPoint(touch.position);
+        // Check for user touch input
+        HandleTouchInput();
 
-            if (touch.phase == TouchPhase.Began)
-            {
-                Collider2D touched_position = Physics2D.OverlapPoint(touch_position);
-                if (Col == touched_position && Game_Master.Instance.Getpause() == false)
-                {
-                    timer = 0;
-                    Score_Manager.instance.Add_Score();
-                    this.gameObject.GetComponent<SpriteRenderer>().sprite = five;
-                    sprite = 5;
-                    gameObject.GetComponent<Randomizer>().New_position();
-                }
-            }
-        }
-
+        // Update sprite or end game based on elapsed time
+        UpdateSpriteAndCheckTimeout();
     }
-    void show_timer(Check_For_Touch obj, float timer, int sprite)
+
+    /// <summary>
+    /// Checks for a single touch event. If the target is tapped, resets the timer and updates the score.
+    /// </summary>
+    private void HandleTouchInput()
     {
-        if (timer >= gameObject.GetComponent<Randomizer>().Get_timer())
+        // Only proceed if there's at least one touch
+        if (Input.touchCount == 0) return;
+
+        Touch touch = Input.GetTouch(0);
+        if (touch.phase != TouchPhase.Began) return;
+
+        // Convert screen point to world coordinates
+        Vector2 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+        // Check if our collider was touched
+        Collider2D touchedCollider = Physics2D.OverlapPoint(touchPosition);
+
+        // If this object was touched and the game isn't paused
+        if (touchedCollider == myCollider && Game_Master.Instance.Getpause() == false)
         {
+            // Reset timer
+            timer = 0f;
+            // Increase score
+            Score_Manager.instance.Add_Score();
+
+            // Reset sprite to #5
+            spriteRenderer.sprite = spriteFive;
+            currentSpriteIndex = 5;
+
+            // Move target to a new random position
+            randomizer.New_position();
+        }
+    }
+
+    /// <summary>
+    /// Compares the current timer with the allowed time to decide if we switch sprites or end the game.
+    /// </summary>
+    private void UpdateSpriteAndCheckTimeout()
+    {
+        float allowedTime = randomizer.Get_timer();
+        // If timer exceeds allowed time, end game
+        if (timer >= allowedTime)
+        {
+            PlayerPrefs.SetInt("score", Score_Manager.instance.Get_Score());
             SceneManager.LoadScene("End");
+            return;
         }
-        if (timer >= 1 && timer < 2)
+
+        // Update the sprite based on which second boundary we're in
+        // 1s intervals: [0-1)=5, [1-2)=4, [2-3)=3, [3-4)=2, [4-5)=1
+        if (timer >= 1f && timer < 2f && currentSpriteIndex != 4)
         {
-            if (sprite != 4)
-            {
-                obj.gameObject.GetComponent<SpriteRenderer>().sprite = four;
-                sprite = 4;
-            }
+            spriteRenderer.sprite = spriteFour;
+            currentSpriteIndex = 4;
         }
-        else if (timer >= 2 && timer < 3)
+        else if (timer >= 2f && timer < 3f && currentSpriteIndex != 3)
         {
-            if (sprite != 3)
-            {
-                obj.gameObject.GetComponent<SpriteRenderer>().sprite = three;
-                sprite = 3;
-            }
+            spriteRenderer.sprite = spriteThree;
+            currentSpriteIndex = 3;
         }
-        else if (timer >= 3 && timer < 4)
+        else if (timer >= 3f && timer < 4f && currentSpriteIndex != 2)
         {
-            if (sprite != 2)
-            {
-                obj.gameObject.GetComponent<SpriteRenderer>().sprite = two;
-                sprite = 2;
-            }
+            spriteRenderer.sprite = spriteTwo;
+            currentSpriteIndex = 2;
         }
-        else if (timer >= 4 && timer < 5)
+        else if (timer >= 4f && timer < 5f && currentSpriteIndex != 1)
         {
-            if (sprite != 1)
-            {
-                obj.gameObject.GetComponent<SpriteRenderer>().sprite = one;
-                sprite = 1;
-            }
+            spriteRenderer.sprite = spriteOne;
+            currentSpriteIndex = 1;
         }
     }
 }

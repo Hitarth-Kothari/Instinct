@@ -1,113 +1,129 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Randomly moves the target around the screen. 
+/// Speed scales with score. Also defines the allowed timer for tapping.
+/// </summary>
 public class Randomizer : MonoBehaviour
 {
-    // Environment coordinates
-    float down;
-    float up;
-    float left;
-    float right;
+    [Header("Movement Speed Settings")]
+    [Tooltip("Minimum movement speed of the target.")]
+    [SerializeField] private float minDifficulty = 3f;
 
-    // Error margin
-    float error = 0.5f;
+    [Tooltip("Maximum movement speed of the target.")]
+    [SerializeField] private float maxDifficulty = 20f;
 
-    // Target Position used for directional movement
-    Vector2 Target_Position;
+    [Tooltip("Score at which the target hits maximum speed.")]
+    [SerializeField] private int maxDifficultyScore = 1000;
 
-    // Difficulty
-    float Min_difficulty = 3;
-    float Max_difficulty = 20;
-    float Difficulty;
+    [Header("Screen Bounds Padding")]
+    [Tooltip("Padding around the edges of the screen.")]
+    [SerializeField] private float screenPadding = 0.5f;
 
-    // Change Position
-    bool change;
+    [Header("Time Allowed Before Player Loses")]
+    [Tooltip("Seconds before game ends if not tapped.")]
+    [SerializeField] private float timer = 5f;
 
-    // Max difficulty score
-    int Max_difficulty_score = 1000;
+    // Screen edges for random positioning
+    private float bottom;
+    private float top;
+    private float left;
+    private float right;
 
-    // Max time allowed
-    float timer = 5;
-    // Start is called before the first frame update
-    void Start()
+    // The target's current movement destination
+    private Vector2 targetPosition;
+
+    // Flag set true when the target needs repositioning after a tap
+    private bool shouldReposition;
+
+    private Camera mainCamera;
+
+    private void Start()
     {
-        // Camera for screen edge detection
-        Camera cam = Camera.main;
-        // Bottom left corner
-        Vector2 bottomLeft = (Vector2)cam.ScreenToWorldPoint(new Vector3(0, 0, cam.nearClipPlane));
-        // Top right corner
-        Vector2 topRight = (Vector2)cam.ScreenToWorldPoint(new Vector3(cam.pixelWidth, cam.pixelHeight, cam.nearClipPlane));
-        // Max and Min range for Target
-        float d = bottomLeft.y;
-        float u = topRight.y;
-        float l = bottomLeft.x;
-        float r = topRight.x;
-        // Set environment
-        set_environment(d, u, l, r);
-        // Random start position
-        transform.position = Randomize_Position();
-        // Random direction
-        Target_Position = Randomize_Position();
-        // Set change to false
-        change = false;
+        mainCamera = Camera.main;
+        SetEnvironmentBounds();
+
+        // Generate initial positions
+        transform.position = GetRandomPosition();
+        targetPosition = GetRandomPosition();
+        shouldReposition = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (change)
+        if (shouldReposition)
         {
-            // respawn target
-            transform.position = Randomize_Position();
-            Target_Position = Randomize_Position();
-            change = false;
+            // If tapped, choose a new random position
+            transform.position = GetRandomPosition();
+            targetPosition = GetRandomPosition();
+            shouldReposition = false;
         }
         else
         {
-            // difficulty settings
-            if ((Vector2)transform.position != Target_Position)
+            // Calculate speed based on current score
+            float difficulty = Mathf.Lerp(minDifficulty, maxDifficulty, GetScoreRatio());
+
+            // Move towards the target position
+            if ((Vector2)transform.position != targetPosition)
             {
-                Difficulty = Mathf.Lerp(Min_difficulty, Max_difficulty, GetDifficulty());
-                transform.position = Vector2.MoveTowards(transform.position, Target_Position, Difficulty * Time.deltaTime);
+                transform.position = Vector2.MoveTowards(
+                    transform.position,
+                    targetPosition,
+                    difficulty * Time.deltaTime
+                );
             }
             else
             {
-                Target_Position = Randomize_Position();
+                // If reached the position, pick another random spot
+                targetPosition = GetRandomPosition();
             }
         }
-
     }
-    // Sets environment
-    void set_environment(float d, float u, float l, float r)
+
+    /// <summary>
+    /// Sets the four edges of the screen with a padding to avoid partial off-screen spawns.
+    /// </summary>
+    private void SetEnvironmentBounds()
     {
-        down = d + error;
-        up = u - error;
-        left = l + error;
-        right = r - error;
+        Vector2 bottomLeft = mainCamera.ScreenToWorldPoint(new Vector3(0, 0, mainCamera.nearClipPlane));
+        Vector2 topRight = mainCamera.ScreenToWorldPoint(new Vector3(mainCamera.pixelWidth, mainCamera.pixelHeight, mainCamera.nearClipPlane));
+
+        bottom = bottomLeft.y + screenPadding;
+        top = topRight.y - screenPadding;
+        left = bottomLeft.x + screenPadding;
+        right = topRight.x - screenPadding;
     }
 
-    // Finds a random point on screen
-    Vector2 Randomize_Position()
+    /// <summary>
+    /// Generates a random position within the screen boundaries.
+    /// </summary>
+    private Vector2 GetRandomPosition()
     {
         float randomX = Random.Range(left, right);
-        float randomY= Random.Range(up, down);
-
+        float randomY = Random.Range(top, bottom);
         return new Vector2(randomX, randomY);
     }
 
-    // Bool for new position once clicked
+    /// <summary>
+    /// Returns a value [0..1] that indicates how far we are from min to max difficulty, based on score.
+    /// </summary>
+    private float GetScoreRatio()
+    {
+        int score = Score_Manager.instance.Get_Score();
+        return Mathf.Clamp01((float)score / maxDifficultyScore);
+    }
+
+    /// <summary>
+    /// Called by Check_For_Touch to trigger a new random position after the target is tapped.
+    /// </summary>
     public void New_position()
     {
-        change = true;
+        shouldReposition = true;
     }
 
-    // Max difficulty percentage
-    float GetDifficulty()
-    {
-        return Mathf.Clamp01(Score_Manager.instance.Get_Score() / Max_difficulty_score);
-    }
-
+    /// <summary>
+    /// Returns the total time allowed before the player is considered to have lost.
+    /// </summary>
     public float Get_timer()
     {
         return timer;

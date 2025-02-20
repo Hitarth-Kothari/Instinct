@@ -1,34 +1,39 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// Manages the final score display and updates high score if applicable.
+/// </summary>
 public class Final_score_manager : MonoBehaviour
 {
-    // Highscore
-    static int highscore;
-    // Text file for score
-    public TMP_Text Final_score;
-    // Text file for highscore
-    public TMP_Text Highscore;
-    // Start is called before the first frame update
-    void Start()
+    [Header("Score UI References")]
+    [Tooltip("Text for displaying current final score.")]
+    public TMP_Text finalScoreText;
+
+    [Tooltip("Text for displaying high score.")]
+    public TMP_Text highScoreText;
+
+    // Static highscore value used by PlayerPrefs
+    private static int highscore;
+
+    private void Start()
     {
-        highscore = PlayerPrefs.GetInt("highscore", highscore);
-        Final_score.text = Score_Manager.instance.Get_Score().ToString();
-        if(Score_Manager.instance.Get_Score() >= highscore)
+        // Load stored highscore (default 0 if not set)
+        highscore = PlayerPrefs.GetInt("highscore", 0);
+
+        // Current session score
+        int currentScore = PlayerPrefs.GetInt("score", 0);
+        finalScoreText.text = currentScore.ToString();
+
+        // If our current score beats stored highscore, update it
+        if (currentScore > highscore)
         {
-            highscore = Score_Manager.instance.Get_Score();
+            highscore = currentScore;
             PlayerPrefs.SetInt("highscore", highscore);
             PlayerPrefs.Save();
         }
-        Highscore.text = highscore.ToString();
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // Display the updated highscore
+        highScoreText.text = highscore.ToString();
     }
 }
